@@ -225,117 +225,87 @@ s: 6.126042ms
       s: 0.101708ms
                 const token = this.$store.state.token;
                 const response = await fetch(`/api/restaurants/${this.cartRestaurantId}/available-slots`, {
-A 20 second timer was set on the process and it has been exceeded.
                 });
                 if (!response.ok) throw new Error((await response.json()).message || "Could not load time slots.");
                 this.availableDays = await response.json();
                 if (this.availableDays.length === 0) {
-s: 6.124958ms
                 }
-A 20 second timer was set on the process and it has been exceeded.
                 this.slotsError = err.message;
-      s: 0.100583ms
                 this.slotsLoading = false;
             }
         },
 
         // --- ADDED NEW METHODS FOR FETCHING AND APPLYING COUPONS ---
         async fetchApplicableCoupons() {
-A 20 second timer was set on the process and it has been exceeded.
             this.couponsLoading = true;
-s: 6.123875ms
                 const token = this.$store.state.token;
-OS error: Could not open file
                     headers: { 'Authentication-Token': token }
                 });
                 if (!response.ok) throw new Error("Could not load coupons.");
-A 20 second timer was set on the process and it has been exceeded.
             } catch (err) {
                 console.error(err.message); // Log error silently
             } finally {
                 this.couponsLoading = false;
             }
-s: 6.122417ms
         formatCouponDeal(coupon) {
-A 20 second timer was set on the process and it has been exceeded.
-s: 6.121542ms
             }
             return `₹${coupon.discount_value} OFF`;
         },
         selectAndApplyCoupon(coupon) {
             this.couponCode = coupon.code;
-section ar 1
         },
         
-A 20 second timer was set on the process and it has been exceeded.
             if (!this.couponCode) {
                 this.couponError = "Please enter a coupon code.";
                 return;
             }
             this.isApplyingCoupon = true;
-s: 6.120292ms
             this.couponError = null;
             try {
                 const token = this.$store.state.token;
                 const response = await fetch('/api/coupons/apply', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authentication-Token': token },
-A 20 second timer was set on the process and it has been exceeded.
                         code: this.couponCode,
                         subtotal: this.subtotal,
                         restaurant_id: this.cartRestaurantId
                     })
                 });
                 const data = await response.json();
-s: 6.119042ms
                 if (!response.ok) throw new Error(data.message);
 
                 this.discountAmount = data.discount;
                 this.appliedCoupon = this.couponCode;
                 
             } catch (err) {
-A 20 second timer was set on the process and it has been exceeded.
-s: 6.11825ms
                 this.isApplyingCoupon = false;
             }
         },
         async placeOrder() {
             this.isPlacing = true; this.error = null;
-Date: 2025-10-30T11:41:40.835Z
-A 20 second timer was set on the process and it has been exceeded.
                 this.isPlacing = false; return;
             }
             
             let payload = {
-m_public.js:462
-s: 6.117083ms
                 items: this.cartItems.map(item => ({ menu_item_id: item.id, quantity: item.quantity })),
                 coupon_code: this.appliedCoupon,
                 scheduled_time: this.selectedTime 
             };
 
             try {
-    ci 1
-A 20 second timer was set on the process and it has been exceeded.
-s: 6.115875ms
+
                     headers: { 'Content-Type': 'application/json', 'Authentication-Token': token },
                     body: JSON.stringify(payload)
                 });
-              _http-streams.js:316
-s: 0.101708ms
-A 20 second timer was set on the process and it has been exceeded.
-               C: 0.05ms
+
                 this.$store.dispatch('clearCart');
                 alert(data.message);
                 this.$router.push({ name: 'OrderDetail', params: { id: data.order_id } });
             } catch (err) {
-s: 6.113667ms
             } finally {
                 this.isPlacing =  false;
-Date: 2025-10-30T11:41:40.849Z
             }
         }
     }
-A 20 second timer was set on the process and it has been exceeded.
 
 export default CustomerCheckoutPage;
