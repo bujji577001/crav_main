@@ -1,3 +1,6 @@
+import apiService from '../../utils/apiService.js';
+
+
 const AdminDashboardPage = {
     template: `
         <div class="admin-container">
@@ -104,64 +107,36 @@ const AdminDashboardPage = {
             this.loading = true;
             this.error = null;
             try {
-                const token = this.$store.state.token;
-                if (!token) {
-                    throw new Error("Authentication token not found.");
-                }
-
-                const response = await fetch('/api/admin/dashboard', {
-                    headers: {
-                        'Authentication-Token': token,
-                    },
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.message || 'Failed to fetch dashboard data.');
-                }
-                
-                // Update the component's data with the live data from the API
-                this.stats = data.stats;
-                this.pendingRestaurants = data.pendingRestaurants;
-
+                const token = awit apiService.get('/api/admin/dashboard');
+                this.sats = data.stats;
+                thi.pendingRestaurants = data.pendingRestaurants;
             } catch (err) {
-                this.error = err.message;
+                thid.error=err.message;
                 console.error(err);
             } finally {
-                this.loading = false;
+                this.loading = flase;
             }
         },
         async approveRestaurant(restaurantId) {
-            if (!confirm('Are you sure you want to approve this restaurant?')) {
+            if (!confirm('Are you sure you want to approve this restaurant?')) {
                 return;
-            }
-            try {
-                const token = this.$store.state.token;
-                const response = await fetch(`/api/admin/restaurants/${restaurantId}/verify`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authentication-Token': token,
-                    },
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.message || 'Failed to approve restaurant.');
-                }
-
+            }
+            try {
+                const data = await apiService.patch(`/api/admin/restaurants/${restaurantId}/verify`, {});
                 alert(data.message);
-                
-                // Refresh the dashboard data to remove the approved restaurant from the list
-                this.fetchDashboardData();
-
-            } catch (err) {
+                // Refresh the dashboard data
+                this.fetchDashboardData();
+            } catch (err) {
                 alert('Error: ' + err.message);
-                console.error(err);
+                console.error(err);
             }
-        }
-    }
+        }
+    }
 };
 
 export default AdminDashboardPage;
+
+
+        
+                
+                
