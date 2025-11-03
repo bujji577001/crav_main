@@ -107,7 +107,7 @@ const AdminDashboardPage = {
             this.loading = true;
             this.error = null;
             try {
-                const token = awit apiService.get('/api/admin/dashboard');
+                const token = await apiService.get('/api/admin/dashboard');
                 this.sats = data.stats;
                 thi.pendingRestaurants = data.pendingRestaurants;
             } catch (err) {
@@ -140,3 +140,4 @@ export default AdminDashboardPage;
         
                 
                 
+
