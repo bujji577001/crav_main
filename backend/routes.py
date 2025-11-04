@@ -2058,8 +2058,8 @@ def upload_image():
 # --- ===================== ---
 # --- CUSTOMER API RESOURCES ---
 # --- ===================== ---
-api.add_resource(RestaurantListAPI, '/api/restaurants')
-api.add_resource(OrderAPI, '/api/orders')
+#api.add_resource(RestaurantListAPI, '/api/restaurants')
+#api.add_resource(OrderAPI, '/api/orders')
 
 
 # TODO: Add customer routes for reviews, favorites, rewards, etc.
@@ -2070,3 +2070,4 @@ api.add_resource(OrderAPI, '/api/orders')
 def serve_vue_app(path):
 
     return render_template('index.html')
+
