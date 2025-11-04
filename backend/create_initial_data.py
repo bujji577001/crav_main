@@ -14,25 +14,35 @@ def create_data():
         owner_role = user_datastore.find_or_create_role(name='owner', description='Restaurant owner')
 
         # --- FIX 2: Commit the roles to the database FIRST ---
-        # This ensures they exist before we try to assign them to users.
         db.session.commit()
 
-        # User creation
-        if not user_datastore.find_user(email='admin@email.com'):
-            # --- FIX 3: Assign the ROLE OBJECT (admin_role), not the string "admin" ---
-            user_datastore.create_user(email='admin@email.com', password='admin123', roles=[admin_role])
+        # --- FIX 3: Find users and ADD ROLES if they are missing ---
         
-        if not user_datastore.find_user(email='customer1@email.com'):
-            user_datastore.create_user(email='customer1@email.com', password='cust123', roles=[customer_role])
+        # Admin User
+        admin_user = user_datastore.find_user(email='admin@email.com')
+        if not admin_user:
+            admin_user = user_datastore.create_user(email='admin@email.com', password='admin123', roles=[admin_role])
+        elif not user_datastore.has_role(admin_user, 'admin'):
+            user_datastore.add_role_to_user(admin_user, admin_role)
+
+        # Customer User
+        customer_user = user_datastore.find_user(email='customer1@email.com')
+        if not customer_user:
+            customer_user = user_datastore.create_user(email='customer1@email.com', password='cust123', roles=[customer_role])
+        elif not user_datastore.has_role(customer_user, 'customer'):
+            user_datastore.add_role_to_user(customer_user, customer_role)
+
+        # Owner User
+        owner_user = user_datastore.find_user(email='owner1@email.com')
+        if not owner_user:
+            owner_user = user_datastore.create_user(email='owner1@email.com', password='owner123', roles=[owner_role])
+        elif not user_datastore.has_role(owner_user, 'owner'):
+            user_datastore.add_role_to_user(owner_user, owner_role)
         
-        if not user_datastore.find_user(email='owner1@email.com'):
-            user_datastore.create_user(email='owner1@email.com', password='owner123', roles=[owner_role])
-        
-        # --- This commit saves the new users ---
+        # --- This commit saves the user/role changes ---
         db.session.commit()
 
         # --- The rest of your script is perfectly fine ---
-        owner_user = user_datastore.find_user(email='owner1@email.com')
         if owner_user and not Restaurant.query.filter_by(owner_id=owner_user.id).first():
             new_resto = Restaurant(
                 owner_id=owner_user.id,
