@@ -10,11 +10,9 @@ const AdminDashboardPage = {
         <div class="admin-container">
             <h2 class="admin-page-title">Platform Dashboard</h2>
             
-            <!-- Loading and Error States -->
             <div v-if="loading" class="alert alert-info">Loading dashboard data...</div>
             <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
-            <!-- Main Content -->
             <div v-if="!loading && !error">
                 <div class="row">
                     <div class="col-lg-3 col-md-6 mb-4">
