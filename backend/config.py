@@ -17,7 +17,7 @@ class Config():
 
 # Configuration for local development using SQLite
 class LocalDevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = "sqlite:///../instance/database.sqlite3" # Adjusted path for instance folder
+    SQLALCHEMY_DATABASE_URI = "sqlite:///../instance/database_v2.sqlite3" # Adjusted path for instance folder
     DEBUG = True
 
 # ✅ START: ADDED PRODUCTION CONFIG
@@ -28,4 +28,5 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', '').replace('postgres://', 'postgresql://')
     DEBUG = False
 # ✅ END: ADDED PRODUCTION CONFIG
+
 
