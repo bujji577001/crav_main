@@ -1,54 +1,57 @@
 from app import app
 from backend.extensions import db
 from backend.security import user_datastore
-from backend.models import Restaurant, Category, MenuItem
+from backend.models import Restaurant, Category, MenuItem, User
 
 def create_data():
     """Function to create initial roles, users, and sample data."""
     with app.app_context():
         db.create_all()
         
-        # --- FIX 1: Find or create roles and SAVE THEM to variables ---
+        # --- 1. Find or create roles ---
         admin_role = user_datastore.find_or_create_role(name='admin', description='Superuser')
         customer_role = user_datastore.find_or_create_role(name='customer', description='General customer')
         owner_role = user_datastore.find_or_create_role(name='owner', description='Restaurant owner')
 
-        # --- FIX 2: Commit the roles to the database FIRST ---
+        # --- 2. Commit the roles to the database FIRST ---
         db.session.commit()
 
-        # --- FIX 3: Find users and ADD ROLES if they are missing ---
+        # --- 3. Find/Create users and THEN add roles ---
         
         # Admin User
         admin_user = user_datastore.find_user(email='admin@email.com')
         if not admin_user:
-            admin_user = user_datastore.create_user(email='admin@email.com', password='admin123', roles=[admin_role])
-        # --- THIS IS THE CORRECTED LINE ---
+            admin_user = user_datastore.create_user(email='admin@email.com', password='admin123')
+            db.session.commit() # Commit the new user FIRST
+            user_datastore.add_role_to_user(admin_user, admin_role)
         elif not admin_user.has_role('admin'):
             user_datastore.add_role_to_user(admin_user, admin_role)
 
         # Customer User
         customer_user = user_datastore.find_user(email='customer1@email.com')
         if not customer_user:
-            customer_user = user_datastore.create_user(email='customer1@email.com', password='cust123', roles=[customer_role])
-        # --- THIS IS THE CORRECTED LINE ---
+            customer_user = user_datastore.create_user(email='customer1@email.com', password='cust123')
+            db.session.commit() # Commit the new user FIRST
+            user_datastore.add_role_to_user(customer_user, customer_role)
         elif not customer_user.has_role('customer'):
             user_datastore.add_role_to_user(customer_user, customer_role)
 
         # Owner User
         owner_user = user_datastore.find_user(email='owner1@email.com')
         if not owner_user:
-            owner_user = user_datastore.create_user(email='owner1@email.com', password='owner123', roles=[owner_role])
-        # --- THIS IS THE CORRECTED LINE ---
-        elif not owner_user.has_role('owner'):
+            owner_user = user_datastore.create_user(email='owner1@email.com', password='owner123')
+            db.session.commit() # Commit the new user FIRST
             user_datastore.add_role_to_user(owner_user, owner_role)
         
-        # --- This commit saves the user/role changes ---
+        # --- This commit saves all the user/role changes ---
         db.session.commit()
 
-        # --- The rest of your script is perfectly fine ---
-        if owner_user and not Restaurant.query.filter_by(owner_id=owner_user.id).first():
+        # --- The rest of your script for creating restaurant data ---
+        # We need to find the owner_user again *after* the session commit to ensure it's attached
+        owner_user_from_db = user_datastore.find_user(email='owner1@email.com')
+        if owner_user_from_db and not Restaurant.query.filter_by(owner_id=owner_user_from_db.id).first():
             new_resto = Restaurant(
-                owner_id=owner_user.id,
+                owner_id=owner_user_from_db.id,
                 name="Owner One's Eatery",
                 description="A default restaurant for testing.",
                 address="123 Food St",
@@ -76,4 +79,3 @@ def create_data():
 
 if __name__ == '__main__':
     create_data()
-
