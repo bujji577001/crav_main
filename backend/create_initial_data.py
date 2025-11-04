@@ -8,23 +8,30 @@ def create_data():
     with app.app_context():
         db.create_all()
         
-        # Role creation
-        user_datastore.find_or_create_role(name='admin', description='Superuser')
-        user_datastore.find_or_create_role(name='customer', description='General customer')
-        user_datastore.find_or_create_role(name='owner', description='Restaurant owner')
+        # --- FIX 1: Find or create roles and SAVE THEM to variables ---
+        admin_role = user_datastore.find_or_create_role(name='admin', description='Superuser')
+        customer_role = user_datastore.find_or_create_role(name='customer', description='General customer')
+        owner_role = user_datastore.find_or_create_role(name='owner', description='Restaurant owner')
+
+        # --- FIX 2: Commit the roles to the database FIRST ---
+        # This ensures they exist before we try to assign them to users.
+        db.session.commit()
 
         # User creation
         if not user_datastore.find_user(email='admin@email.com'):
-            user_datastore.create_user(email='admin@email.com', password='admin123', roles=['admin'])
+            # --- FIX 3: Assign the ROLE OBJECT (admin_role), not the string "admin" ---
+            user_datastore.create_user(email='admin@email.com', password='admin123', roles=[admin_role])
         
         if not user_datastore.find_user(email='customer1@email.com'):
-            user_datastore.create_user(email='customer1@email.com', password='cust123', roles=['customer'])
+            user_datastore.create_user(email='customer1@email.com', password='cust123', roles=[customer_role])
         
         if not user_datastore.find_user(email='owner1@email.com'):
-            user_datastore.create_user(email='owner1@email.com', password='owner123', roles=['owner'])
+            user_datastore.create_user(email='owner1@email.com', password='owner123', roles=[owner_role])
         
+        # --- This commit saves the new users ---
         db.session.commit()
 
+        # --- The rest of your script is perfectly fine ---
         owner_user = user_datastore.find_user(email='owner1@email.com')
         if owner_user and not Restaurant.query.filter_by(owner_id=owner_user.id).first():
             new_resto = Restaurant(
@@ -33,11 +40,8 @@ def create_data():
                 description="A default restaurant for testing.",
                 address="123 Food St",
                 city="Flavor Town",
-                # --- ✅ START: ADDED GEOLOCATION DATA ---
-                # Example coordinates for New York City
                 latitude=40.7128,
                 longitude=-74.0060,
-                # --- ✅ END: ADDED GEOLOCATION DATA ---
                 is_verified=True 
             )
             db.session.add(new_resto)
