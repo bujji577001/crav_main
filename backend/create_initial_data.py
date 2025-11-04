@@ -22,21 +22,24 @@ def create_data():
         admin_user = user_datastore.find_user(email='admin@email.com')
         if not admin_user:
             admin_user = user_datastore.create_user(email='admin@email.com', password='admin123', roles=[admin_role])
-        elif not user_datastore.has_role(admin_user, 'admin'):
+        # --- THIS IS THE CORRECTED LINE ---
+        elif not admin_user.has_role('admin'):
             user_datastore.add_role_to_user(admin_user, admin_role)
 
         # Customer User
         customer_user = user_datastore.find_user(email='customer1@email.com')
         if not customer_user:
             customer_user = user_datastore.create_user(email='customer1@email.com', password='cust123', roles=[customer_role])
-        elif not user_datastore.has_role(customer_user, 'customer'):
+        # --- THIS IS THE CORRECTED LINE ---
+        elif not customer_user.has_role('customer'):
             user_datastore.add_role_to_user(customer_user, customer_role)
 
         # Owner User
         owner_user = user_datastore.find_user(email='owner1@email.com')
         if not owner_user:
             owner_user = user_datastore.create_user(email='owner1@email.com', password='owner123', roles=[owner_role])
-        elif not user_datastore.has_role(owner_user, 'owner'):
+        # --- THIS IS THE CORRECTED LINE ---
+        elif not owner_user.has_role('owner'):
             user_datastore.add_role_to_user(owner_user, owner_role)
         
         # --- This commit saves the user/role changes ---
