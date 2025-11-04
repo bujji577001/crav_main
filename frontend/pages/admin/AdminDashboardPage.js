@@ -114,7 +114,7 @@ const AdminDashboardPage = {
                 thid.error=err.message;
                 console.error(err);
             } finally {
-                this.loading = flase;
+                this.loading = false;
             }
         },
         async approveRestaurant(restaurantId) {
@@ -140,4 +140,5 @@ export default AdminDashboardPage;
         
                 
                 
+
 
