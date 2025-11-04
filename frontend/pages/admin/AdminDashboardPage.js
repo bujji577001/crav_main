@@ -84,7 +84,7 @@ const AdminDashboardPage = {
             </div>
      </div>
     `,
-content-type: text/plain; charset=utf-8     data() {
+content_type: text/plain; charset=utf-8     data() {
         return {
             // Initialize with empty/default data
             loading: true,
@@ -96,7 +96,7 @@ content-type: text/plain; charset=utf-8     data() {
                 totalRestaurants: 0
             },
             pendingRestaurants: []
-E     }
+    }
     },
     async mounted() {
         // This hook runs when the component is added to the page.
@@ -142,4 +142,5 @@ Access-Control-Max-Age: 3600 }
 };
 
 export default AdminDashboardPage;
+
 
