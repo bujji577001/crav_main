@@ -45,9 +45,21 @@ app = createApp()
 # WhiteNoise will automatically find the `static_folder` ('frontend') from the 
 # Flask `app` object and handle serving those files efficiently.
 app.wsgi_app = WhiteNoise(app.wsgi_app)
+# --- START: ADD THIS NEW CODE FOR RENDER ---
+from backend.create_initial_data import create_data
+
+@app.cli.command("init-db")
+def init_db_command():
+    """Runs the create_initial_data script."""
+    print("--- Running Database Initial Setup ---")
+    create_data()
+    print("--- Database Setup Complete ---")
+# --- END: ADD THIS NEW CODE FOR RENDER ---
+
 
 # This block is only for running the app locally with the Flask development server.
 # Gunicorn will not use this when you deploy to Render.
 if (__name__ == '__main__'):
     app.run(debug=True)
+
 
