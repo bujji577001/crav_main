@@ -2052,6 +2052,10 @@ def upload_image():
     except Exception as e:
         print(f"Error during image compression: {e}")
         return jsonify({"message": "An error occurred while processing the image."}), 500
+@app.before_request
+def debug_token():
+    print("Received Authentication-Token:", request.headers.get('Authentication-Token'))
+
     
 
     
@@ -2070,4 +2074,5 @@ def upload_image():
 def serve_vue_app(path):
 
     return render_template('index.html')
+
 
