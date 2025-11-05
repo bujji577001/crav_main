@@ -1,4 +1,4 @@
-from app import app
+#from app import app
 from backend.extensions import db
 from backend.security import user_datastore
 from backend.models import Restaurant, Category, MenuItem, User, Role
@@ -88,4 +88,6 @@ def create_data():
         print("Initial data created/updated successfully.")
 
 if __name__ == '__main__':
+    from app import app
     create_data()
+
