@@ -1,10 +1,14 @@
-#from app import app
+# --- DO NOT IMPORT APP HERE ---
 from backend.extensions import db
 from backend.security import user_datastore
 from backend.models import Restaurant, Category, MenuItem, User, Role
 
-def create_data():
+# --- THIS IS THE FIX ---
+# The function now accepts 'app' as an argument
+def create_data(app):
+# --- END OF FIX ---
     """Function to create initial roles, users, and sample data."""
+    # We no longer need to import 'app' here
     with app.app_context():
         db.create_all()
         
@@ -88,6 +92,10 @@ def create_data():
         print("Initial data created/updated successfully.")
 
 if __name__ == '__main__':
-    from app import app
-    create_data()
-
+    # --- THIS IS THE FIX ---
+    # We must import createApp from app.py, create an app instance,
+    # and then pass it to our create_data function.
+    from app import createApp
+    app = createApp()
+    create_data(app)
+    # --- END OF FIX ---
