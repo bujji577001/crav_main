@@ -16,7 +16,7 @@ def create_data():
         # --- 2. Commit the roles to the database FIRST ---
         db.session.commit()
 
-        # --- 3. Find/Create users and THEN add roles ---
+        # --- 3. Find/Create users and THEN add roles (CORRECTED LOGIC) ---
         
         # Admin User
         admin_user = user_datastore.find_user(email='admin@email.com')
@@ -47,7 +47,6 @@ def create_data():
         db.session.commit()
 
         # --- The rest of your script for creating restaurant data ---
-        # We need to find the owner_user again *after* the session commit to ensure it's attached
         owner_user_from_db = user_datastore.find_user(email='owner1@email.com')
         if owner_user_from_db and not Restaurant.query.filter_by(owner_id=owner_user_from_db.id).first():
             new_resto = Restaurant(
