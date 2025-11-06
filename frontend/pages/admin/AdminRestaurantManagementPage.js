@@ -196,7 +196,7 @@ const AdminRestaurantManagementPage = {
             } catch (err) {
                 // This will now show the *real* error, not "Unexpected token"
                 this.error = err.message;
-          . } finally {
+            } finally {
                 this.loading = false;
             }
         },
@@ -323,3 +323,4 @@ const AdminRestaurantManagementPage = {
     }
 };
 export default AdminRestaurantManagementPage;
+
