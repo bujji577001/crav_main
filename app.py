@@ -47,17 +47,13 @@ app = createApp()
 app.wsgi_app = WhiteNoise(app.wsgi_app)
 
 # --- START: RENDER COMMAND CODE ---
-from backend.create_initial_data import create_data
-
-@app.cli.command("init-db")
-def init_db_command():
-    """Runs the create_initial_data script."""
-    print("--- Running Database Initial Setup ---")
-    # --- THIS IS THE FIX ---
-    # We must pass the 'app' object to the function
-    create_data(app)
-    # --- END OF FIX ---
-    print("--- Database Setup Complete ---")
+#
+# THIS ENTIRE BLOCK HAS BEEN REMOVED.
+# It was causing the ImportError and crashing the app.
+# We are now using the temporary /api/admin/run-db-setup route
+# (defined in routes.py) to initialize the database safely after
+# the app has started.
+#
 # --- END: RENDER COMMAND CODE ---
 
 
