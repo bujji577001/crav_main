@@ -32,6 +32,33 @@ from werkzeug.security import check_password_hash
 # Make sure to import the user_datastore from your security file
 from .security import user_datastore
 
+# --- ✅ NEW: IMPORT FOR ONE-TIME DATABASE SETUP ---
+from .create_initial_data import init_app as initialize_database
+# --- END NEW IMPORT ---
+
+# --- ✅ NEW: TEMPORARY ROUTE TO SET UP DATABASE ---
+# --- Visit this URL ONCE after deploying to Render ---
+@app.route('/api/admin/run-db-setup', methods=['GET'])
+def temp_setup_database():
+    """
+    This is a temporary, one-time-use endpoint to initialize
+    your roles and create the admin user on Render.
+    """
+    print("--- [TEMP SETUP] STARTING DATABASE INITIALIZATION ---")
+    try:
+        # Pass the actual app object to the function
+        initialize_database(app._get_current_object()) 
+        print("--- [TEMP SETUP] DATABASE INITIALIZATION COMPLETE ---")
+        return jsonify({
+            "status": "success",
+            "message": "Database setup complete! Check Render logs for details. You can now log in with admin@crav.com / admin123"
+        }), 200
+    except Exception as e:
+        error_message = f"Error during temp setup: {str(e)}"
+        print(f"--- [TEMP SETUP] ERROR: {error_message} ---", file=sys.stderr)
+        return jsonify({"status": "error", "message": error_message}), 500
+# --- END NEW ROUTE ---
+
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -2074,5 +2101,6 @@ def debug_token():
 def serve_vue_app(path):
 
     return render_template('index.html')
+
 
 
