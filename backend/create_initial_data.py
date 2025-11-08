@@ -25,55 +25,76 @@ def create_roles(ds):
     return role_objects
 
 def create_users_and_data(ds, roles):
-    """Finds or creates default users and sample restaurant data."""
+    """
+    Finds or creates default users and sample restaurant data.
+    --- THIS IS THE FIX ---
+    This function now *finds and updates* existing users
+    to ensure they have the correct roles.
+    """
     
-    print("Finding or creating users...")
+    print("Finding, creating, or updating users...")
     
-    # Admin User
+    # --- Admin User (Corrected Logic) ---
     admin_email = "admin@crav.com"
-    if not ds.find_user(email=admin_email):
-        ds.create_user(
+    admin_user = ds.find_user(email=admin_email)
+    
+    if not admin_user:
+        admin_user = ds.create_user(
             email=admin_email,
             password="admin123",
-            name="Admin User",
-            roles=[roles["admin"]] # Pass the role object directly
+            name="Admin User"
+            # Roles will be added below
         )
         print(f"Admin user '{admin_email}' created.")
+    
+    # Now, check and add the role if it's missing
+    if not admin_user.has_role("admin"):
+        ds.add_role_to_user(admin_user, roles["admin"])
+        print(f"Added 'admin' role to '{admin_email}'.")
 
-    # Owner User
+    # --- Owner User (Corrected Logic) ---
     owner_email = "owner1@email.com"
     owner_user = ds.find_user(email=owner_email)
+    
     if not owner_user:
         owner_user = ds.create_user(
             email=owner_email,
             password="owner123",
-            name="Owner One",
-            roles=[roles["owner"]]
+            name="Owner One"
         )
         print(f"Owner user '{owner_email}' created.")
+        
+    if not owner_user.has_role("owner"):
+        ds.add_role_to_user(owner_user, roles["owner"])
+        print(f"Added 'owner' role to '{owner_email}'.")
     
-    # Customer User
+    # --- Customer User (Corrected Logic) ---
     cust_email = "customer1@email.com"
-    if not ds.find_user(email=cust_email):
-        ds.create_user(
+    cust_user = ds.find_user(email=cust_email)
+    
+    if not cust_user:
+        cust_user = ds.create_user(
             email=cust_email,
             password="cust123",
-            name="Customer One",
-            roles=[roles["customer"]]
+            name="Customer One"
         )
         print(f"Customer user '{cust_email}' created.")
+        
+    if not cust_user.has_role("customer"):
+        ds.add_role_to_user(cust_user, roles["customer"])
+        print(f"Added 'customer' role to '{cust_email}'.")
     
     db.session.commit()
-    print("Users check/creation complete.")
+    print("Users check/creation/update complete.")
 
     # --- Create Restaurant Data ---
     # Re-fetch owner_user to ensure we have the ID, even if just created
-    owner_user = ds.find_user(email=owner_email) 
+    owner_user_from_db = ds.find_user(email=owner_email) 
 
     print("Finding or creating sample restaurant data...")
-    if owner_user and not Restaurant.query.filter_by(owner_id=owner_user.id).first():
+    if owner_user_from_db and not Restaurant.query.filter_by(owner_id=owner_user_from_db.id).first():
         new_resto = Restaurant(
-            owner_id=owner_user.id,
+            owner_id=owner_user_from_db.id,
             name="Owner One's Eatery",
             description="A default restaurant for testing.",
             address="123 Food St",
