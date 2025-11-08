@@ -15,10 +15,10 @@ class Config:
     # --- Flask-Security-Too Configuration ---
     SECURITY_PASSWORD_SALT = os.environ.get('SECURITY_PASSWORD_SALT', 'a_very_secret_salt_fallback')
     
-    # We are moving this setting into the classes below to be more explicit
-    # SECURITY_TOKEN_MAX_AGE = 86400 
-
+    # We use a token-based authentication system
     SECURITY_TOKEN_AUTHENTICATION_HEADER = "Authentication-Token"
+    
+    # Disable CSRF for our stateless API
     WTF_CSRF_ENABLED = False
     SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS = True
 
@@ -35,9 +35,10 @@ class ProductionConfig(Config):
     if not SECURITY_PASSWORD_SALT:
         raise ValueError("No SECURITY_PASSWORD_SALT set for production app")
 
-    # --- THIS IS THE FIX ---
-    # We've added the setting directly here to ensure it is read.
-    SECURITY_TOKEN_MAX_AGE = 86400 # 24 hours in seconds
+    # --- THIS IS THE CORRECT FIX ---
+    # The old 'SECURITY_TOKEN_MAX_AGE' key was for a different token system.
+    # The correct key for the default JWT tokens is 'SECURITY_JWT_ACCESS_TOKEN_EXPIRES'.
+    SECURITY_JWT_ACCESS_TOKEN_EXPIRES = 86400 # 24 hours in seconds
 
 
 class LocalDevelopmentConfig(Config):
@@ -47,6 +48,5 @@ class LocalDevelopmentConfig(Config):
     # DATABASE_URL="sqlite:///./instance/local.db"
     # This will create a local.db file in an 'instance' folder.
     
-    # --- THIS IS THE FIX ---
-    # We've added the setting directly here to ensure it is read.
-    SECURITY_TOKEN_MAX_AGE = 86400 # 24 hours in seconds
+    # --- THIS IS THE CORRECT FIX ---
+    SECURITY_JWT_ACCESS_TOKEN_EXPIRES = 86400 # 24 hours in seconds
