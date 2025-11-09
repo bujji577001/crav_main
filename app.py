@@ -5,6 +5,8 @@ from backend.config import LocalDevelopmentConfig, ProductionConfig
 from backend.security import user_datastore
 import os
 from whitenoise import WhiteNoise
+from flask_jwt_extended import JWTManager
+import datetime
 
 def createApp():
     """
@@ -24,11 +26,18 @@ def createApp():
     else:
         app.config.from_object(LocalDevelopmentConfig)
 
+    # Add JWT configuration
+    app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=24)
+    
     # Initialize all Flask extensions
     db.init_app(app)
     api.init_app(app)
     migrate.init_app(app, db)
-    security.init_app(app, user_datastore) 
+    security.init_app(app, user_datastore)
+    
+    # Initialize JWT
+    jwt = JWTManager(app)
     
     # Push an application context to make sure extensions can be used
     app.app_context().push()
@@ -57,10 +66,22 @@ app.wsgi_app = WhiteNoise(app.wsgi_app)
 #
 # --- END: RENDER COMMAND CODE ---
 
+# Health check endpoint
+@app.route('/health')
+def health_check():
+    return {'status': 'healthy', 'timestamp': datetime.datetime.utcnow().isoformat()}
+
+# Database initialization endpoint
+@app.route('/api/init-db')
+def init_db():
+    try:
+        db.create_all()
+        return {'message': 'Database initialized successfully'}, 200
+    except Exception as e:
+        return {'error': str(e)}, 500
 
 # This block is only for running the app locally with the Flask development server.
 # Gunicorn will not use this when you deploy to Render.
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
-
