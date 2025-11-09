@@ -22,6 +22,10 @@ class Config:
     WTF_CSRF_ENABLED = False
     SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS = True
 
+    # JWT Configuration
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
+    JWT_ACCESS_TOKEN_EXPIRES = 86400  # 24 hours in seconds
+
 
 class ProductionConfig(Config):
     """Production configuration (used by Render)."""
@@ -35,10 +39,10 @@ class ProductionConfig(Config):
     if not SECURITY_PASSWORD_SALT:
         raise ValueError("No SECURITY_PASSWORD_SALT set for production app")
 
-    # --- THIS IS THE CORRECT FIX ---
-    # The old 'SECURITY_TOKEN_MAX_AGE' key was for a different token system.
-    # The correct key for the default JWT tokens is 'SECURITY_JWT_ACCESS_TOKEN_EXPIRES'.
-    SECURITY_JWT_ACCESS_TOKEN_EXPIRES = 86400 # 24 hours in seconds
+    # JWT Configuration for production
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+    if not JWT_SECRET_KEY:
+        raise ValueError("No JWT_SECRET_KEY set for production app")
 
 
 class LocalDevelopmentConfig(Config):
@@ -47,6 +51,3 @@ class LocalDevelopmentConfig(Config):
     # The .env file should contain:
     # DATABASE_URL="sqlite:///./instance/local.db"
     # This will create a local.db file in an 'instance' folder.
-    
-    # --- THIS IS THE CORRECT FIX ---
-    SECURITY_JWT_ACCESS_TOKEN_EXPIRES = 86400 # 24 hours in seconds
