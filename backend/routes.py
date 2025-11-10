@@ -893,28 +893,37 @@ def manage_favorite(restaurant_id):
 
 @app.route('/api/restaurants/featured', methods=['GET'])
 def get_featured_restaurants():
-    restaurants = Restaurant.query.filter_by(is_verified=True, is_active=True).limit(6).all()
-    restaurants_data = []
-    for resto in restaurants:
-        # Calculate stats
-        stats = db.session.query(
-            func.avg(Review.rating).label('avg_rating'),
-            func.count(Review.id).label('review_count')
-        ).filter(Review.restaurant_id == resto.id).first()
-        
-        # ✅ START: LOGIC TO USE GALLERY IMAGE OR FALLBACK
-        image_url = f'https://placehold.co/600x400/E65100/FFF?text={resto.name.replace(" ", "+")}'
-        if resto.gallery and len(resto.gallery) > 0:
-            image_url = resto.gallery[0]
-        # ✅ END: LOGIC TO USE GALLERY IMAGE
+    try:
+        restaurants = Restaurant.query.filter_by(is_verified=True, is_active=True).limit(6).all()
+        restaurants_data = []
+        for resto in restaurants:
+            # Calculate stats
+            stats = db.session.query(
+                func.avg(Review.rating).label('avg_rating'),
+                func.count(Review.id).label('review_count')
+            ).filter(Review.restaurant_id == resto.id).first()
+            
+            # ✅ START: LOGIC TO USE GALLERY IMAGE OR FALLBACK
+            image_url = f'https://placehold.co/600x400/E65100/FFF?text={resto.name.replace(" ", "+")}'
+            if resto.gallery and len(resto.gallery) > 0:
+                image_url = resto.gallery[0]
+            # ✅ END: LOGIC TO USE GALLERY IMAGE
 
-        restaurants_data.append({
-            'id': resto.id, 'name': resto.name, 'cuisine': 'Local Favorites',
-            'rating': round(float(stats.avg_rating or 0), 1),
-            'reviews': stats.review_count or 0,
-            'image': image_url # Use the dynamic image_url
-        })
-    return jsonify(restaurants_data), 200
+            restaurants_data.append({
+                'id': resto.id, 'name': resto.name, 'cuisine': 'Local Favorites',
+                'rating': round(float(stats.avg_rating or 0), 1),
+                'reviews': stats.review_count or 0,
+                'image': image_url # Use the dynamic image_url
+            })
+        
+        return jsonify(restaurants_data), 200
+
+    except Exception as e:
+        # CRITICAL FIX: Rollback the transaction to unblock the database
+        db.session.rollback()
+        print(f"CRITICAL FEATURED RESTAURANTS ERROR: {e}")
+        # Return an empty list on error to prevent a 500 crash page
+        return jsonify([]), 500
 
 
 
@@ -2112,6 +2121,7 @@ def debug_token():
 #def serve_vue_app(path):
 
  #   return render_template('index.html')
+
 
 
 
