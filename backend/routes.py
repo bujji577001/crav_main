@@ -2098,11 +2098,12 @@ def debug_token():
 # TODO: Add customer routes for reviews, favorites, rewards, etc.
 
 # --- Frontend Serving Route ---
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve_vue_app(path):
+#@app.route('/', defaults={'path': ''})
+#@app.route('/<path:path>')
+#def serve_vue_app(path):
 
-    return render_template('index.html')
+ #   return render_template('index.html')
+
 
 
 
