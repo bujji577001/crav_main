@@ -12,24 +12,17 @@ def createApp():
     """
     Creates and configures the Flask application. This is the app factory.
     """
-    # This configuration tells Flask where your static files and templates are,
-    # and that they should be served from the root URL path (e.g., /app.js), not /static/app.js.
     app = Flask(__name__,
                 static_folder='frontend',
                 template_folder='frontend',
                 static_url_path='')
     
     # Automatically select the correct configuration based on the environment.
-    # Render sets FLASK_ENV=production by default.
     if os.environ.get('FLASK_ENV') == 'production':
         app.config.from_object(ProductionConfig)
     else:
         app.config.from_object(LocalDevelopmentConfig)
 
-    # 🚨 REMOVE DUPLICATE JWT CONFIG (already in config.py)
-    # app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
-    # app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=24)
-    
     # Initialize all Flask extensions
     db.init_app(app)
     api.init_app(app)
@@ -52,11 +45,9 @@ def createApp():
 app = createApp()
 
 # Wrap the Flask app with WhiteNoise.
-# WhiteNoise will automatically find the `static_folder` ('frontend') from the 
-# Flask `app` object and handle serving those files efficiently.
 app.wsgi_app = WhiteNoise(app.wsgi_app)
 
-# 🚨 CRITICAL: Add proper static file serving for Vue Router history mode
+# 🚨 CRITICAL FIX: Remove duplicate route definitions
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_vue_app(path):
