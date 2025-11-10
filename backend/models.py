@@ -44,6 +44,9 @@ class Restaurant(db.Model):
     latitude = db.Column(db.Float, nullable=True)
     longitude = db.Column(db.Float, nullable=True)
     # --- ✅ END: GEOLOCATION FIELDS ADDED ---
+    # --- ✅ START: ADDED RESTAURANT OPERATIONAL FIELD ---
+    opening_hours = db.Column(db.String(255), nullable=True) # e.g. "9:00 AM - 10:00 PM"
+    # --- ✅ END: ADDED RESTAURANT OPERATIONAL FIELD ---
 
     is_verified = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
@@ -144,4 +147,5 @@ class TimeSlot(db.Model):
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurant.id'), nullable=False)
     day_of_week = db.Column(db.String(10), nullable=False) # e.g., "Monday", "Tuesday"
     start_time = db.Column(db.Time, nullable=False)
+
     end_time = db.Column(db.Time, nullable=False)
