@@ -1280,6 +1280,7 @@ def manage_restaurant_profile():
         restaurant.address = data.get('address', restaurant.address)
         restaurant.city = data.get('city', restaurant.city)
         restaurant.is_active = data.get('isActive', restaurant.is_active)
+        restaurant.opening_hours = data.get('openingHours', restaurant.opening_hours)
         # Save the updated gallery list sent from the frontend
         restaurant.gallery = data.get('gallery', restaurant.gallery)
         
@@ -2103,6 +2104,7 @@ def debug_token():
 #def serve_vue_app(path):
 
  #   return render_template('index.html')
+
 
 
 
