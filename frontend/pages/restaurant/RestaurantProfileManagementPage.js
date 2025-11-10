@@ -49,7 +49,6 @@ const RestaurantProfileManagementPage = {
                         
                         <hr class="my-4">
 
-                        <!-- ✅ START: DYNAMIC PHOTO GALLERY -->
                         <h5>Photo Gallery</h5>
                         <div v-if="uploadError" class="alert alert-danger mt-2">{{ uploadError }}</div>
                         <div class="row gallery-thumbnails mt-3">
@@ -70,8 +69,6 @@ const RestaurantProfileManagementPage = {
                                 <input type="file" id="photoUpload" @change="handlePhotoUpload" accept="image/jpeg, image/png, image/webp" class="d-none">
                             </div>
                         </div>
-                        <!-- ✅ END: DYNAMIC PHOTO GALLERY -->
-
                         <button type="submit" class="btn btn-brand float-right" :disabled="isSaving">
                             {{ isSaving ? 'Saving...' : 'Save Changes' }}
                         </button>
@@ -86,6 +83,7 @@ const RestaurantProfileManagementPage = {
             isSaving: false,
             error: null,
             successMessage: null,
+            // --- MODIFIED: Initialized openingHours ---
             restaurant: {
                 isActive: true, name: '', openingHours: '', address: '', city: '',
                 description: '', gallery: []
@@ -180,4 +178,3 @@ const RestaurantProfileManagementPage = {
 };
 
 export default RestaurantProfileManagementPage;
-
