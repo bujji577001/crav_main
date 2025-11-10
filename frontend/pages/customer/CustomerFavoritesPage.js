@@ -1,4 +1,6 @@
 import RestaurantCard from '../../components/RestaurantCard.js';
+// --- ADDED: Import the unified API service ---
+import apiService from '../../utils/apiService.js';
 
 const CustomerFavoritesPage = {
     components: {
@@ -8,20 +10,17 @@ const CustomerFavoritesPage = {
         <div class="container my-5">
             <h2 class="text-center mb-5">Your Favorite <span class="text-brand">Restaurants</span></h2>
             
-            <!-- Loading and Error States -->
             <div v-if="loading" class="text-center">
                 <p>Loading your favorite restaurants...</p>
             </div>
             <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
-            <!-- Content: Favorites List -->
             <div v-if="!loading && !error && favorites.length > 0" class="row">
                 <div v-for="restaurant in favorites" :key="restaurant.id" class="col-lg-4 col-md-6 mb-4">
                     <RestaurantCard :restaurant="restaurant" />
                 </div>
             </div>
 
-            <!-- Content: Empty State -->
             <div v-if="!loading && !error && favorites.length === 0" class="text-center empty-state-container">
                 <img src="https://i.imgur.com/giffiRD.png" alt="Empty Favorites" class="empty-state-image">
                 <h3 class="mt-4">No Favorites Yet!</h3>
@@ -45,21 +44,12 @@ const CustomerFavoritesPage = {
             this.loading = true;
             this.error = null;
             try {
-                const token = this.$store.state.token;
-                if (!token) {
-                    throw new Error("You must be logged in to view your favorites.");
-                }
-                const response = await fetch('/api/favorites', {
-                    headers: {
-                        'Authentication-Token': token
-                    }
-                });
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.message || "Failed to fetch favorite restaurants.");
-                }
+                // --- MODIFIED: Use apiService.get() instead of raw fetch ---
+                // apiService automatically handles the token and response validation
+                const data = await apiService.get('/api/favorites');
                 this.favorites = data;
             } catch (err) {
+                // apiService throws an Error object with the message on failure
                 this.error = err.message;
             } finally {
                 this.loading = false;
