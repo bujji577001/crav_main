@@ -9,7 +9,12 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'a_very_secret_default_key_fallback')
     
     # --- Database Configuration ---
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3')
+    # 🚨 CRITICAL FIX: Handle PostgreSQL URL format for Render
+    database_url = os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3')
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    SQLALCHEMY_DATABASE_URI = database_url
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # --- Flask-Security-Too Configuration ---
@@ -43,6 +48,10 @@ class ProductionConfig(Config):
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
     if not JWT_SECRET_KEY:
         raise ValueError("No JWT_SECRET_KEY set for production app")
+
+    # 🚨 IMPORTANT: Disable debug mode in production
+    DEBUG = False
+    TESTING = False
 
 
 class LocalDevelopmentConfig(Config):
