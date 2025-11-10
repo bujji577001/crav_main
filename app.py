@@ -1,5 +1,5 @@
 # --- Force Redeploy v2 ---
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 from backend.extensions import db, security, api, migrate
 from backend.config import LocalDevelopmentConfig, ProductionConfig
 from backend.security import user_datastore
@@ -26,9 +26,9 @@ def createApp():
     else:
         app.config.from_object(LocalDevelopmentConfig)
 
-    # Add JWT configuration
-    app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=24)
+    # 🚨 REMOVE DUPLICATE JWT CONFIG (already in config.py)
+    # app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
+    # app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=24)
     
     # Initialize all Flask extensions
     db.init_app(app)
@@ -56,15 +56,20 @@ app = createApp()
 # Flask `app` object and handle serving those files efficiently.
 app.wsgi_app = WhiteNoise(app.wsgi_app)
 
-# --- START: RENDER COMMAND CODE ---
-#
-# THIS ENTIRE BLOCK HAS BEEN REMOVED.
-# It was causing the ImportError and crashing the app.
-# We are now using the temporary /api/admin/run-db-setup route
-# (defined in routes.py) to initialize the database safely after
-# the app has started.
-#
-# --- END: RENDER COMMAND CODE ---
+# 🚨 CRITICAL: Add proper static file serving for Vue Router history mode
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_vue_app(path):
+    """
+    Serve the Vue.js application for all routes.
+    This allows Vue Router to handle client-side routing.
+    """
+    # Serve static files (JS, CSS, images, etc.)
+    if path and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    
+    # For all other routes, serve index.html (Vue Router will handle the rest)
+    return send_from_directory(app.static_folder, 'index.html')
 
 # Health check endpoint
 @app.route('/health')
