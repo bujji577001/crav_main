@@ -65,23 +65,31 @@ def login():
     if not data or not data.get('email') or not data.get('password'):
         return jsonify({"message": "Email and password are required"}), 400
 
-    user = user_datastore.find_user(email=data.get('email'))
+    try:
+        user = user_datastore.find_user(email=data.get('email'))
 
-    # 👇 THIS IS THE CRITICAL CHANGE 👇
-    # Use verify_password instead of check_password_hash
-    if not user or not verify_password(data.get('password'), user.password):
-        return jsonify({"message": "Invalid credentials"}), 401
+        # 👇 THIS IS THE CRITICAL CHANGE 👇
+        # Use verify_password instead of check_password_hash
+        if not user or not verify_password(data.get('password'), user.password):
+            return jsonify({"message": "Invalid credentials"}), 401
+            
+        auth_token = user.get_auth_toke()
         
-    auth_token = user.get_auth_toke()
-    
-    # User is authenticated
-    return jsonify({
-        "message": "Login Successful",
-        "token": user.get_auth_token(),
-        "user": {
-            "id": user.id, "email": user.email, "name": user.name, "roles": [r.name for r in user.roles]
-        }
-    }), 200
+        # User is authenticated
+        return jsonify({
+            "message": "Login Successful",
+            "token": user.get_auth_token(),
+            "user": {
+                "id": user.id, "email": user.email, "name": user.name, "roles": [r.name for r in user.roles]
+            }
+        }), 200
+        
+    except Exception as e:
+        # Rollback the session immediately if it's aborted (like with InFailedSqlTransaction)
+        db.session.rollback()
+        print(f"CRITICAL LOGIN ERROR: {e}")
+        # Return a generic 500 error to the client
+        return jsonify({"message": "An internal server error occurred. Please try again."}), 500
 
 
 @app.route('/api/register', methods=['POST'])
@@ -2104,6 +2112,7 @@ def debug_token():
 #def serve_vue_app(path):
 
  #   return render_template('index.html')
+
 
 
 
