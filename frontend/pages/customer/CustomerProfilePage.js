@@ -1,3 +1,5 @@
+import apiService from '../../utils/apiService.js';
+
 const CustomerProfilePage = {
     template: `
         <div class="container my-5">
@@ -68,25 +70,12 @@ const CustomerProfilePage = {
             this.isSaving = true;
             
             try {
-                const token = this.$store.state.token;
-                const response = await fetch('/api/profile', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authentication-Token': token
-                    },
-                    body: JSON.stringify({ name: this.user.name })
-                });
+                // --- THIS IS THE FIX ---
+                // No more manual fetch or token handling.
+                const data = await apiService.put('/api/profile', { name: this.user.name });
+                // --- END OF FIX ---
 
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.message || 'Failed to update profile.');
-                }
-
-                // --- IMPORTANT ---
                 // Commit the updated user object to the Vuex store
-                // so the Navbar and other components update immediately.
                 this.$store.commit('SET_USER', data.user);
 
                 this.successMessage = data.message;
