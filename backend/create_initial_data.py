@@ -1,4 +1,4 @@
-# --- DO NOT IMPORT APP HERE ---
+import os # <-- 1. ADD THIS IMPORT
 from .models import db, User, Role, Restaurant, Category, MenuItem
 from .security import user_datastore
 import sys
@@ -40,6 +40,11 @@ def create_users_and_data(ds, roles):
     
     print("Finding, creating, or updating users...")
     
+    # --- 2. USE ENVIRONMENT VARIABLES FOR PASSWORDS ---
+    admin_pass = os.environ.get('DEFAULT_ADMIN_PASS', 'admin123')
+    owner_pass = os.environ.get('DEFAULT_OWNER_PASS', 'owner123')
+    cust_pass = os.environ.get('DEFAULT_CUST_PASS', 'cust123')
+    
     # --- Admin User ---
     admin_email = "admin@crav.com"
     try:
@@ -48,12 +53,11 @@ def create_users_and_data(ds, roles):
         if not admin_user:
             admin_user = ds.create_user(
                 email=admin_email,
-                password="admin123",
+                password=admin_pass, # <-- USE VARIABLE
                 name="Admin User"
             )
             print(f"Admin user '{admin_email}' created.")
         
-        # Now, check and add the role if it's missing
         if not admin_user.has_role("admin"):
             ds.add_role_to_user(admin_user, roles["admin"])
             print(f"Added 'admin' role to '{admin_email}'.")
@@ -68,7 +72,7 @@ def create_users_and_data(ds, roles):
         if not owner_user:
             owner_user = ds.create_user(
                 email=owner_email,
-                password="owner123",
+                password=owner_pass, # <-- USE VARIABLE
                 name="Owner One"
             )
             print(f"Owner user '{owner_email}' created.")
@@ -87,7 +91,7 @@ def create_users_and_data(ds, roles):
         if not cust_user:
             cust_user = ds.create_user(
                 email=cust_email,
-                password="cust123",
+                password=cust_pass, # <-- USE VARIABLE
                 name="Customer One"
             )
             print(f"Customer user '{cust_email}' created.")
@@ -106,6 +110,7 @@ def create_users_and_data(ds, roles):
         db.session.rollback()
 
     # --- Create Restaurant Data ---
+    # ... (rest of the file is fine) ...
     try:
         owner_user_from_db = ds.find_user(email=owner_email) 
 
