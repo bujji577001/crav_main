@@ -26,7 +26,7 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(255))
     active = db.Column(db.Boolean())
     fs_uniquifier = db.Column(db.String(64), unique=True, nullable=False)
-    roles = db.relationship('Role', secondary='roles_users', backref=db.backref('users', lazy='dynamic'))
+    roles = db.relationship('Role', secondary='roles_users', backref=db.backref('users', lazy=True))
 
     orders = db.relationship('Order', backref='customer', lazy=True)
     reviews = db.relationship('Review', backref='customer', lazy=True)
@@ -149,3 +149,4 @@ class TimeSlot(db.Model):
     start_time = db.Column(db.Time, nullable=False)
 
     end_time = db.Column(db.Time, nullable=False)
+
