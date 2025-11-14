@@ -73,7 +73,7 @@ def login():
         if not user or not verify_password(data.get('password'), user.password):
             return jsonify({"message": "Invalid credentials"}), 401
             
-        auth_token = user.get_auth_toke()
+        auth_token = user.get_auth_token()
         
         # User is authenticated
         return jsonify({
@@ -2121,6 +2121,7 @@ def debug_token():
 #def serve_vue_app(path):
 
  #   return render_template('index.html')
+
 
 
 
