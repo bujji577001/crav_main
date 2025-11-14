@@ -79,5 +79,6 @@ def init_db():
 # This block is only for running the app locally with the Flask development server.
 # Gunicorn will not use this when you deploy to Render.
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port)
+    port = int(os.environ.get)
+    app.run
+
