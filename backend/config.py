@@ -38,6 +38,7 @@ class Config:
     
     # Disable the "view" that it tries to redirect to.
     SECURITY_UNAUTHORIZED_VIEW = None
+    SECURITY_TEARDOWN_APP_CONTEXT = False
     # --- 💡 END OF FIX ---
 
 
@@ -63,3 +64,4 @@ class LocalDevelopmentConfig(Config):
     # The .env file should contain:
     # DATABASE_URL="sqlite:///./instance/local.db"
     # This will create a local.db file in an 'instance' folder.
+
