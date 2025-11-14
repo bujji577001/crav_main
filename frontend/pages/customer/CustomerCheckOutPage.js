@@ -1,3 +1,5 @@
+import apiService from '../../utils/apiService.js'; // <-- 1. IMPORT
+
 const CustomerCheckoutPage = {
     template: `
         <div class="container my-5">
@@ -5,8 +7,7 @@ const CustomerCheckoutPage = {
             <div class="row">
                 <div class="col-lg-7">
 
-                    <!-- Order Type Selection -->
-                    <div class="card mb-4">
+                                        <div class="card mb-4">
                         <div class="card-body">
                             <h4 class="card-title">1. Choose Order Type</h4>
                             <div class="btn-group btn-group-toggle d-flex">
@@ -20,8 +21,7 @@ const CustomerCheckoutPage = {
                         </div>
                     </div>
 
-                    <!-- Scheduling Section -->
-                    <div class="card mb-4">
+                                        <div class="card mb-4">
                         <div class="card-body">
                             <h4 class="card-title">2. Choose When</h4>
                             
@@ -63,15 +63,13 @@ const CustomerCheckoutPage = {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+              .         </div>
                     </div>
 
-                    <!-- Coupon Section -->
-                    <div class="card">
+                                        <div class="card">
                          <div class="card-body">
                             <h4 class="card-title">3. Apply Coupon</h4>
 
-                            <!-- ✅ START: DISPLAY AVAILABLE COUPONS -->
                             <div v-if="couponsLoading" class="text-muted small my-3">Loading available coupons...</div>
                             <div v-if="!couponsLoading && availableCoupons.length > 0" class="mb-3">
                                 <small class="text-muted d-block mb-2">Available for you:</small>
@@ -81,11 +79,10 @@ const CustomerCheckoutPage = {
                                             class="btn btn-sm btn-outline-success mr-2 mb-2"
                                             @click="selectAndApplyCoupon(coupon)"
                                             :disabled="!!appliedCoupon">
-                                        {{ coupon.code }} <!--<span class="coupon-deal">({{ formatCouponDeal(coupon) }})</span> -->
+                                        {{ coupon.code }}
                                     </button>
                                 </div>
                             </div>
-                            <!-- ✅ END: DISPLAY AVAILABLE COUPONS -->
 
                             <div v-if="couponError" class="alert alert-danger">{{ couponError }}</div>
                             <div v-if="appliedCoupon" class="alert alert-success">
@@ -93,7 +90,7 @@ const CustomerCheckoutPage = {
                             </div>
                             <div class="input-group">
                                 <input type="text" class="form-control" v-model="couponCode" placeholder="Enter coupon code" :disabled="!!appliedCoupon">
-                                <div class="input-group-append">
+                      t       <div class="input-group-append">
                                     <button class="btn btn-brand" @click="applyCoupon" :disabled="isApplyingCoupon || !!appliedCoupon">
                                         {{ isApplyingCoupon ? '...' : 'Apply' }}
                                     </button>
@@ -103,8 +100,7 @@ const CustomerCheckoutPage = {
                     </div>
                 </div>
 
-                <!-- Order Summary -->
-                <div class="col-lg-5">
+                                <div class="col-lg-5">
                     <div class="card order-summary-card">
                         <div class="card-body">
                             <div v-if="error" class="alert alert-danger">{{ error }}</div>
@@ -112,22 +108,22 @@ const CustomerCheckoutPage = {
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span>Subtotal</span><strong>₹{{ subtotal.toLocaleString('en-IN') }}</strong>
-                                </li>
+line-clamp: 3;                       </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <span>Delivery Fee</span><strong>₹{{ deliveryFee.toLocaleString('en-IN') }}</strong>
-                                </li>
+i                       </li>
                                 <li v-if="appliedCoupon" class="list-group-item d-flex justify-content-between text-success">
                                     <span>Discount</span><strong>-₹{{ discountAmount.toLocaleString('en-IN') }}</strong>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between total-row">
                                     <h5>Total</h5><h5>₹{{ total.toLocaleString('en-IN') }}</h5>
                                 </li>
-                            </ul>
+                  E       </ul>
                             <button class="btn btn-brand btn-block mt-4" @click="placeOrder" :disabled="isPlacing || (isScheduling && !selectedTime)">
                                 {{ isPlacing ? 'Placing Order...' : 'Place Order' }}
                             </button>
                         </div>
-                    </div>
+  s               </div>
                 </div>
             </div>
         </div>
@@ -181,18 +177,14 @@ const CustomerCheckoutPage = {
                 this.scheduleChoice = 'later';
             } else {
                 this.scheduleChoice = 'now';
-            }
+e         }
         },
         async fetchAvailableSlots() {
             if (!this.cartRestaurantId) { this.slotsError = "Cart is empty."; this.slotsLoading = false; return; }
             this.slotsLoading = true; this.slotsError = null;
             try {
-                const token = this.$store.state.token;
-                const response = await fetch(`/api/restaurants/${this.cartRestaurantId}/available-slots`, {
-                    headers: { 'Authentication-Token': token }
-                });
-                if (!response.ok) throw new Error((await response.json()).message || "Could not load time slots.");
-                this.availableDays = await response.json();
+              // --- 2. FIX ---
+                this.availableDays = await apiService.get(`/api/restaurants/${this.cartRestaurantId}/available-slots`);
                 if (this.availableDays.length === 0) {
                     this.slotsError = "This restaurant has no scheduled time slots available.";
                 }
@@ -203,17 +195,12 @@ const CustomerCheckoutPage = {
             }
         },
 
-        // --- ADDED NEW METHODS FOR FETCHING AND APPLYING COUPONS ---
         async fetchApplicableCoupons() {
             if (!this.cartRestaurantId) return;
             this.couponsLoading = true;
             try {
-                const token = this.$store.state.token;
-                const response = await fetch(`/api/coupons/applicable/${this.cartRestaurantId}`, {
-                    headers: { 'Authentication-Token': token }
-                });
-                if (!response.ok) throw new Error("Could not load coupons.");
-                this.availableCoupons = await response.json();
+              // --- 3. FIX ---
+                this.availableCoupons = await apiService.get(`/api/coupons/applicable/${this.cartRestaurantId}`);
             } catch (err) {
                 console.error(err.message); // Log error silently
             } finally {
@@ -225,7 +212,7 @@ const CustomerCheckoutPage = {
                 return `${coupon.discount_value}% OFF`;
             }
             return `₹${coupon.discount_value} OFF`;
-        },
+M     },
         selectAndApplyCoupon(coupon) {
             this.couponCode = coupon.code;
             this.applyCoupon();
@@ -239,19 +226,12 @@ const CustomerCheckoutPage = {
             this.isApplyingCoupon = true;
             this.couponError = null;
             try {
-                const token = this.$store.state.token;
-                const response = await fetch('/api/coupons/apply', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authentication-Token': token },
-                    body: JSON.stringify({
+              // --- 4. FIX ---
+              const data = await apiService.post('/api/coupons/apply', {
                         code: this.couponCode,
                         subtotal: this.subtotal,
                         restaurant_id: this.cartRestaurantId
-                    })
-                });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message);
-
+              });
                 this.discountAmount = data.discount;
                 this.appliedCoupon = this.couponCode;
                 
@@ -259,7 +239,7 @@ const CustomerCheckoutPage = {
                 this.couponError = err.message;
             } finally {
                 this.isApplyingCoupon = false;
-            }
+ci     }
         },
         async placeOrder() {
             this.isPlacing = true; this.error = null;
@@ -277,14 +257,8 @@ const CustomerCheckoutPage = {
             };
 
             try {
-                const token = this.$store.state.token;
-                const response = await fetch('/api/orders', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authentication-Token': token },
-                    body: JSON.stringify(payload)
-                });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message);
+              // --- 5. FIX ---
+              const data = await apiService.post('/api/orders', payload);
                 
                 this.$store.dispatch('clearCart');
                 alert(data.message);
