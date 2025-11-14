@@ -5,7 +5,7 @@ from backend.config import LocalDevelopmentConfig, ProductionConfig
 from backend.security import user_datastore
 import os
 from whitenoise import WhiteNoise
-from flask_jwt_extended import JWTManager
+#from flask_jwt_extended import JWTManager
 import datetime
 
 def createApp():
@@ -30,7 +30,7 @@ def createApp():
     security.init_app(app, user_datastore)
     
     # Initialize JWT
-    jwt = JWTManager(app)
+    #jwt = JWTManager(app)
     
     # Push an application context to make sure extensions can be used
     app.app_context().push()
@@ -81,4 +81,5 @@ def init_db():
 if __name__ == '__main__':
     port = int(os.environ.get)
     app.run
+
 
