@@ -28,9 +28,17 @@ class Config:
     WTF_CSRF_ENABLED = False
     SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS = True
 
-    # JWT Configuration
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') # MODIFIED
-    JWT_ACCESS_TOKEN_EXPIRES = 86400  # 24 hours in seconds
+    # --- 💡 START OF FIX: Force Stateless (Token) Authentication ---
+    # Tell Flask-Security to ONLY use token authentication.
+    SECURITY_AUTH_MEANS = ["token"]
+    
+    # When an unauthorized request comes in, return a JSON error
+    # instead of redirecting to an HTML login page.
+    SECURITY_REDIRECT_BEHAVIOR = "json"
+    
+    # Disable the "view" that it tries to redirect to.
+    SECURITY_UNAUTHORIZED_VIEW = None
+    # --- 💡 END OF FIX ---
 
 
 class ProductionConfig(Config):
@@ -43,10 +51,6 @@ class ProductionConfig(Config):
     # Ensure a unique salt is set
     if not Config.SECURITY_PASSWORD_SALT:
         raise ValueError("No SECURITY_PASSWORD_SALT set for production app")
-
-    # JWT Configuration for production
-    if not Config.JWT_SECRET_KEY:
-        raise ValueError("No JWT_SECRET_KEY set for production app")
 
     # 🚨 IMPORTANT: Disable debug mode in production
     DEBUG = False
