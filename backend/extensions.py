@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 db = SQLAlchemy()
 security = Security()
 api = Api()
-jwt = JWTManager()
+#jwt = JWTManager()
 migrate = Migrate()
+
 
