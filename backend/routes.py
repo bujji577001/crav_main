@@ -110,32 +110,7 @@ def register_customer():
     )
     db.session.commit()
     return jsonify({"message": "Customer account created successfully"}), 201
-@security.user_loader
-def load_user_for_token(user_id):
-    """
-    This function explicitly tells Flask-Security how to load a user from
-    the token. 
-    
-    IT CREATES ITS OWN DATABASE SESSION to avoid race conditions
-    with Flask-SQLAlchemy's main session teardown, which is the
-    root cause of the 403 error on production.
-    """
-    try:
-        # Create a new, independent session factory
-        engine = db.get_engine()
-        Session = scoped_session(sessionmaker(bind=engine))
-        session = Session()
-        
-        # Load the user and explicitly JOIN their roles in one query
-        user = session.query(User).options(joinedload(User.roles)).get(user_id)
-        
-        # Clean up the session
-        session.remove()
-        
-        return user
-    except Exception as e:
-        print(f"CRITICAL ERROR IN USER LOADER: {e}")
-        return None
+
 # --- ========================= ---
 # --- RESTAURANT OWNER API ROUTES ---
 # --- ========================= ---
@@ -2148,6 +2123,7 @@ def debug_token():
 #def serve_vue_app(path):
 
  #   return render_template('index.html')
+
 
 
 
