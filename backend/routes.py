@@ -1,5 +1,5 @@
 from flask import current_app as app, jsonify, request, render_template, send_file
-from .extensions import api 
+from .extensions import api,security
 from flask_security import auth_required, roles_required, current_user,verify_password
 from werkzeug.security import check_password_hash
 import io
@@ -2148,6 +2148,7 @@ def debug_token():
 #def serve_vue_app(path):
 
  #   return render_template('index.html')
+
 
 
 
